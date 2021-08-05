@@ -1,0 +1,17 @@
+{
+  "name": "collatz",
+  "version": "1.0.0",
+  "description": "Collatz conjecture",
+  "private": true,
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "collatz",
+    "conjecture"
+  ],
+  "author": "Jani Haiko",
+  "license": "MIT"
+}
