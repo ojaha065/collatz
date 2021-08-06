@@ -6,7 +6,7 @@ const diffLength = difference.toString().length;
 const divisor = BigInt(`1${"0".repeat(diffLength)}`);
 
 // Settings
-const waitTime = 0;
+const waitTime = 2000;
 const debugMode = false;
 
 const sequence = [];
@@ -17,7 +17,8 @@ let startDate;
 start();
 
 function start() {
-    process.stdout.write("\033c"); // Clear the console. Does not work in strict mode.
+    "use strict";
+    clearCmd();
 
     sequenceCount = 0;
     startValue = generateRandomBigInt();
@@ -30,41 +31,50 @@ function start() {
     console.info(`Start value: ${startValue}`);
 
     startDate = new Date().getTime();
-    collatz(startValue);
-}
+    let currentValue = startValue;
+    while (true) {
+        currentValue = currentValue % 2n ? 3n * currentValue + 1n : currentValue / 2n;
 
-function collatz(n) {
-    "use strict";
+        if (debugMode) {
+            sequence.push(currentValue);
+        }
 
-    const nextValue = n % 2n ? 3n * n + 1n : n / 2n;
+        if (++sequenceCount >= Number.MAX_SAFE_INTEGER) {
+            throw new Error("Odd, it seems that the sequence won't reach 1...");
+        }
 
-    if (debugMode) {
-        sequence.push(nextValue);
+        if (currentValue === 1n) {
+            console.info(`Reached 1 in ${sequenceCount.toLocaleString("en-US")} steps`);
+            console.info(`Calculation took ${((new Date().getTime() - startDate) / 1000).toLocaleString("en-US")} seconds`);
+            console.debug(debugMode ? sequence : "(Sequence only available in debug mode)");
+    
+            if (!debugMode) {
+                setTimeout(start, waitTime);
+            }
+            break;
+        }
     }
-
-    if (++sequenceCount >= Number.MAX_SAFE_INTEGER) {
-        throw new Error("Odd, it seems that the sequence won't reach 1...");
-    }
-
-    if (nextValue === 1n) {
-        console.info(`Reached 1 in ${sequenceCount} steps`);
-        console.info(`Calculation took ${(new Date().getTime() - startDate) / 1000} seconds`);
-        console.debug(debugMode ? sequence : "(Sequence only available in debug mode)");
-
-        return setTimeout(start, 10000);
-    }
-
-    setTimeout(collatz.bind(null, nextValue), waitTime);
 }
 
 function generateRandomBigInt() {
     "use strict";
 
+    const negativeLengthVariation = Math.random() < 0.5;
+    const randomLengthVariation = Math.floor(Math.random() * 2600);
+    const resultLength = negativeLengthVariation ? diffLength - randomLengthVariation : diffLength + randomLengthVariation;
+
     let multiplier = "";
-    while (multiplier.length < diffLength) {
+    while (multiplier.length < resultLength) {
         multiplier += Math.random().toString().split(".")[1];
     }
-    multiplier = multiplier.slice(0, diffLength);
+    multiplier = multiplier.slice(0, resultLength);
     const randomDiff = difference * BigInt(multiplier) / divisor;
     return lowerLimit + randomDiff;
+}
+
+/**
+ * Clear the console. In separate function because does not work in strict mode
+ */
+function clearCmd() {
+    process.stdout.write("\033c");
 }
