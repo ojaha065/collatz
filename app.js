@@ -67,7 +67,7 @@ function generateRandomBigInt() {
     while (multiplier.length < resultLength) {
         multiplier += Math.random().toString().split(".")[1];
     }
-    multiplier = multiplier.slice(0, resultLength);
+    multiplier = multiplier.slice(0, resultLength).replace("e-", ""); // TODO: Figure out where "e-" randomly comes in multiplier
     const randomDiff = difference * BigInt(multiplier) / divisor;
     return lowerLimit + randomDiff;
 }
