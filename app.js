@@ -1,6 +1,6 @@
 // Constants for the random BigInt generator
 const lowerLimit = 2n ** 68n; // https://en.wikipedia.org/wiki/Collatz_conjecture (68)
-const upperLimit = 2n ** 9000n; // (9000)
+const upperLimit = 2n ** 90000n; // (90000)
 const difference = upperLimit - lowerLimit;
 const diffLength = difference.toString().length;
 const divisor = BigInt(`1${"0".repeat(diffLength)}`);
@@ -8,6 +8,7 @@ const divisor = BigInt(`1${"0".repeat(diffLength)}`);
 // Settings
 const waitTime = 2000;
 const debugMode = false;
+const skipKnown = true;
 
 const sequence = [];
 let sequenceCount;
@@ -37,6 +38,17 @@ function start() {
 
         if (debugMode) {
             sequence.push(currentValue);
+        }
+
+        if (skipKnown && currentValue <= lowerLimit) {
+            console.info(`Step ${sequenceCount.toLocaleString("en-US")}: reached value that is known to reach 1`);
+            console.info(`Calculation took ${((new Date().getTime() - startDate) / 1000).toLocaleString("en-US")} seconds`);
+            console.debug(debugMode ? sequence : "(Sequence only available in debug mode)");
+
+            if (!debugMode) {
+                setTimeout(start, waitTime);
+            }
+            break;
         }
 
         if (++sequenceCount >= Number.MAX_SAFE_INTEGER) {
