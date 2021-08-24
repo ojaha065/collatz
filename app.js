@@ -1,9 +1,8 @@
 // Constants for the random BigInt generator
 const lowerLimit = 2n ** 68n; // https://en.wikipedia.org/wiki/Collatz_conjecture (68)
 const upperLimit = 2n ** 90000n; // (90000)
-const difference = upperLimit - lowerLimit;
-const diffLength = difference.toString().length;
-const divisor = BigInt(`1${"0".repeat(diffLength)}`);
+const minLength = lowerLimit.toString().length;
+const maxVariance = upperLimit.toString().length - minLength;
 
 // Settings
 const waitTime = 2000;
@@ -71,17 +70,15 @@ function start() {
 function generateRandomBigInt() {
     "use strict";
 
-    const negativeLengthVariation = Math.random() < 0.5;
-    const randomLengthVariation = Math.floor(Math.random() * 2600);
-    const resultLength = negativeLengthVariation ? diffLength - randomLengthVariation : diffLength + randomLengthVariation;
+    const variance = Math.floor(Math.random() * maxVariance);
+    const resultLength = minLength + variance;
 
-    let multiplier = "";
-    while (multiplier.length < resultLength) {
-        multiplier += Math.random().toString().split(".")[1];
+    let result = "";
+    while (result.length < resultLength) {
+        result += Math.random().toString().split(".")[1].replace("e-", "");
     }
-    multiplier = multiplier.slice(0, resultLength).replace("e-", ""); // TODO: Figure out where "e-" randomly comes in multiplier
-    const randomDiff = difference * BigInt(multiplier) / divisor;
-    return lowerLimit + randomDiff;
+    result = result.slice(0, resultLength);
+    return BigInt(result);
 }
 
 /**
